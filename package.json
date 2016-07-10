@@ -1,8 +1,8 @@
 {
-  "name": "alexa-framework",
+  "name": "alexa-router",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/alexa-framework.js",
+  "main": "lib/alexa-router.js",
   "scripts": {
     "test": "node test/"
   },

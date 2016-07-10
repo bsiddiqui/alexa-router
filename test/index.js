@@ -2,8 +2,8 @@
 
 let assert = require('assert')
 
-let AlexaFramework = require('../')
-let alexa = new AlexaFramework()
+let AlexaRouter = require('../')
+let alexa = new AlexaRouter()
 
 let examples = {
   sayHello: {

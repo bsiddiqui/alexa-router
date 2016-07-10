@@ -1,9 +1,9 @@
-# alexa-framework
+# alexa-router
 
 We should probably find a better name for it
 
 ```javascript
-  let alexa = new AlexaFrameword()
+  let alexa = new AlexaRouter()
 
   // Register all routing somehow, this is just an example
   // alexa.route('myIntent', () => {}, { some: 'config' })
@@ -53,7 +53,7 @@ Example using Express
 
 ```javascript
 let express = require('express')
-let AlexaFramework = require('alexa-framework')
+let AlexaRouter = require('alexa-router')
 
 let json = require('body-parser').json()
 let app = express()
