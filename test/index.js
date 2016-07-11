@@ -68,14 +68,14 @@ alexa.route('/say-hello/ok', (request, response) => {
 alexa.dispatch(examples.sayHello)
 .then((res) => {
   let json = res.toJSON()
-  assert.equal(json.response.outputSpeach.type, 'SSML')
-  assert.equal(json.response.outputSpeach.ssml, '<say>Hello world!</say>')
+  assert.equal(json.response.outputSpeech.type, 'SSML')
+  assert.equal(json.response.outputSpeech.ssml, '<say>Hello world!</say>')
 
   return alexa.dispatch(examples.ok)
 })
 .then((res) => {
   let json = res.toJSON()
-  assert.equal(json.response.outputSpeach.type, 'PlainText')
-  assert.equal(json.response.outputSpeach.ssml, 'Ok then, it worked')
+  assert.equal(json.response.outputSpeech.type, 'PlainText')
+  assert.equal(json.response.outputSpeech.ssml, 'Ok then, it worked')
   assert.equal(json.response.shouldEndSession, true)
 })
