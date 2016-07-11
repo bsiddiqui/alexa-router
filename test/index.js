@@ -2,8 +2,38 @@
 
 let assert = require('assert')
 
-let AlexaRouter = require('../')
-let alexa = new AlexaRouter()
+let Alexa = require('../')
+let alexa = new Alexa.Router()
+
+alexa.action('hello-world', {
+  handler: (request) => {
+    let response = request.response()
+    response.speech('Hello world')
+    response.flow({
+      type: 'intent',
+      intent: 'ok',
+      action: 'ok',
+      params: { config: 'Hey this is an param' }
+    })
+
+    return response
+  },
+  auto: {
+    type: 'intent',
+    intent: 'hello-world'
+  }
+})
+
+alexa.action('ok', {
+  handler: (request, params) => {
+    let response = request.response()
+    response.speech('<speak>Hello world!</speak>')
+
+    assert.equal(params.config, 'Hey this is an param')
+
+    return response
+  }
+})
 
 let examples = {
   sayHello: {
@@ -21,10 +51,10 @@ let examples = {
     },
     request: {
       type: 'IntentRequest',
-      requestId: 'another-id',
+      requestId: 'request-hello-world',
       timestamp: new Date().toJSON(),
       intent: {
-        name: 'say-hello',
+        name: 'hello-world',
         slots: {}
       }
     }
@@ -32,13 +62,13 @@ let examples = {
   ok: {
     version: '1.0',
     session: {
-      new: true,
+      new: false,
       sessionId: 'this-should-be-an-id',
       application: {
         applicationId: 'weird-id-wuh?'
       },
       attributes: {
-        referrer: '/say-hello'
+        'alexa-router-flow': '[{"type":"intent","intent":"ok", "action": "ok", "params":{"config":"Hey this is an param"}}]'
       },
       user: {
         userId: 'this-is-an-id'
@@ -46,7 +76,7 @@ let examples = {
     },
     request: {
       type: 'IntentRequest',
-      requestId: 'another-id',
+      requestId: 'request-ok',
       timestamp: new Date().toJSON(),
       intent: {
         name: 'ok',
@@ -56,26 +86,19 @@ let examples = {
   }
 }
 
-alexa.route('/say-hello', (request, response) => {
-  response.speech('<say>Hello world!</say>')
-})
-
-alexa.route('/say-hello/ok', (request, response) => {
-  response.speech('Ok then, it worked')
-  response.endSession(true)
-})
-
 alexa.dispatch(examples.sayHello)
-.then((res) => {
+.then(res => {
   let json = res.toJSON()
-  assert.equal(json.response.outputSpeech.type, 'SSML')
-  assert.equal(json.response.outputSpeech.ssml, '<say>Hello world!</say>')
+  assert.equal(json.response.outputSpeech.type, 'PlainText')
+  assert.equal(json.response.outputSpeech.text, 'Hello world')
 
   return alexa.dispatch(examples.ok)
 })
-.then((res) => {
+.then(res => {
   let json = res.toJSON()
-  assert.equal(json.response.outputSpeech.type, 'PlainText')
-  assert.equal(json.response.outputSpeech.ssml, 'Ok then, it worked')
-  assert.equal(json.response.shouldEndSession, true)
+  assert.equal(json.response.outputSpeech.type, 'SSML')
+  assert.equal(json.response.outputSpeech.ssml, '<speak>Hello world!</speak>')
+})
+.catch(err => {
+  console.log(err.stack)
 })
