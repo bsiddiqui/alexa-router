@@ -1,15 +1,30 @@
 {
   "name": "alexa-router",
   "version": "1.0.0",
-  "description": "",
+  "description": "Easily build custom skills for Alexa",
   "scripts": {
-    "test": "standard && node test/"
+    "test": "standard && lab --verbose --colors --assert code",
+    "test-cov": "standard && npm test -- -r console -o stdout -r html -o coverage/coverage.html -r lcov -o coverage/lcov.info"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/estate/alexa-router.git"
+  },
+  "keywords": [
+    "amazon",
+    "alexa",
+    "custom",
+    "skill",
+    "framework",
+    "route",
+    "action",
+    "routing"
+  ],
+  "author": "Estate <team@tryestate.com>",
+  "license": "MIT",
   "devDependencies": {
     "code": "^3.0.1",
-    "lab": "^10.8.2",
+    "lab": "^10.9.0",
     "standard": "^7.1.2"
   },
   "dependencies": {
