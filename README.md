@@ -1,33 +1,77 @@
 # alexa-router
 
-The `alexa-router` project allows you to easily develop custom skills for
-Amazon's Alexa.
+## Why
+`alexa-router` makes it easy for you to build custom [Alexa](https://developer.amazon.com/alexa)
+skills with complex request/response flows.
 
-### Getting started
+## Install
+```bash
+$ npm install -S alexa-router
+```
 
-All you need to do is `npm install -s alexa-router` and you're already done
-with the setup.
+## Usage
 
-### Understanding actions
-
-The router is configured through actions, next options and globals.
+`alexa-router` is available via an in instance of the `Router`. Make sure you begin by initializing the
+`Router`.
 
 ```javascript
 let Alexa = require('alexa-router')
 let alexa = new Alexa.Router()
+```
 
-// A simple action, note that the user would never be able to reach this
-// action without being present in the next options of some response
-alexa.action('hello-world', {
-  handler: request => {
-    let response = request.response()
-    response.speech('Hello world!')
+Once you intialize the router, you can either configure `actions` or `dispatch` a HTTP request to be
+routed to the actions you have configured.
 
-    return response
-  }
-})
+### `alexa.action`
 
-// An action that can be activated by an incoming intent
+Routes are defined via the `action` method
+
+#### API
+
+`alexa.action(name, config)`
+
+##### name
+*Required* <br>
+Type: `string`
+
+The action name. You can reference this action by its name when defining complex action flows.
+
+##### config
+*Required* <br>
+Type: `object`
+
+`config.handler(request[, params])` <br>
+*Required* <br>
+Type: `function`
+
+The handler receives the HTTP request and optionally receives params if they were configured to
+be passed by a previous action.
+
+`config.global` <br>
+*Optional* <br>
+Type: `object`
+
+Actions with the global key are accessible at any point in the routing flow. These actions can be
+used to kick-off a new flow, interrupt an existing flow, etc. An action to help the user know what
+commands are available or cancel the request are two examples for where you might use a global action.
+
+`config.global.type` <br>
+*Required* <br>
+Type: `string`
+
+One of 'intent', 'launch', 'sessionEnded', or 'unexpected'
+
+`config.global.intent` <br>
+*Required if type === 'intent'* <br>
+Type: `string`
+
+The custom or [built-in](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/implementing-the-built-in-intents)
+intent that this action should be associated with. e.g. 'AMAZON.YesIntent'
+
+#### Examples
+
+A simple action that can be activated by an incoming intent
+```javascript
 alexa.action('global-hello', {
   handler: request => {...},
   global: {
@@ -35,60 +79,73 @@ alexa.action('global-hello', {
     intent: 'AMAZON.YesIntent'
   }
 })
+```
 
-// An action that can be activated by an incoming intent
-alexa.action('here-be-dragons', {
+You can also chain requests by responding with a list of possible actions that could be next in the interaction flow
+
+```javascript
+alexa.action('event-create', {
   handler: request => {
     let response = request.response()
-    response.speech('Sorry, you can\'t activate that command right now')
+    response.speech('What\'s the name of your event?')
+
+    // You can define the next actions by passing an array of actions that can come next
+    response.next([
+      {
+        type: 'intent',
+        intent: 'EventName', // Custom intent
+        action: 'event-create-name'
+        params: { createdAt: new Date() } // Params will be passed to the `event-create-name` handler
+      },
+      {
+        type: 'intent',
+        intent: 'AMAZON.CancelIntent', // Built-in intent
+        action: 'event-cancel'
+      }
+    ])
+
+    // You can also pass an individual object and it will be merged with the previous ones
+    response.next({
+      type: 'unexpected',
+      action: 'event-unexpected'
+    })
+
+    return response
+  },
+
+  global: {
+    type: 'intent',
+    intent: 'EventCreate' // Custom intent
   }
 })
 
-// Finally, you can control the user options by setting the next available commands
-alexa.action('say-the-weather', {
-  handler: (request, params) => {
-    let response = request.response()
-
-    if (params.sayWeather) {
-      response.speech('If you can\'t see the sky then it\'s probably cloudy')
-      response.endSession(true)
-    } else {
-      response.speech('Would you like me to read the weather?')
-
-      // The user can say yes
-      response.next({
-        type: 'intent',
-        intent: 'AMAZON.YesIntent',
-        action: 'say-the-weather', // call me again
-        params: { sayWeather: yes } // Will be passed as the parameters if the user says Yes
-      })
-
-      // If the user send another intent that isn't in the options they will be
-      // routed to here-be-dragons in the next interaction. You can also
-      // pass an array of next options for convenience response.next([...])
-      // Calling next will always merge new next options with previous ones
-      response.next({
-        type: 'unexpected',
-        action: 'here-be-dragons'
-      })
-    }
-
-    // Reply with the response or a promise that resolves to the response
-    return response
-  }
+// This action does not have the global attribute so it can only be accessed if passed
+// as a `next` action
+alexa.action('event-create-name', {
+  handler: (request, params) => {...}
 })
 ```
 
+### `alexa.dispatch`
+
+The dispatch method takes a HTTP request and routes it to the appropriate action
+
+#### API
+
+`alexa.dispatch(requestBody)`
+
+##### requestBody
+*Required* <br>
+Type: 'object'
+
+The HTTP request body
+
 ### Understanding the routing mechanism
 
-How the internal router works?
-
-1. Check if the incoming request has next options
-  1. If next options are present try to resolve the next action
-  2. If no action was resolved see if there's an `unexpected` next configured
-  3. If there's no `unexpected` next then try to find a global `unexpected`
-  4. If no global `unexpected` then throw `RoutingFailed` error
-2. If no next options are present in the request's session then try to match a global action
+1. Check if the incoming request was configured with `next` actions
+  1. If `next` actions are present, try to resolve the next action
+  2. If no action was resolved, check for an `unexpected` type `next` option
+2. If no next actions are present in the request's session, try to match a global action
 3. If no global action was found try to find an `unexpected` global action
 4. If no `unexpected` global action then throw `RoutingFailed`
 
@@ -108,7 +165,7 @@ let alexa = new Alexa.Router()
 // Do all your routing configs
 alexa.action('my-action', ...)
 
-// Configure a route for passing a JSON to alexa-router and reply with a JSON too
+// Configure a route for passing JSON to alexa-router
 app.post('/alexa/incoming', bodyParser.json(), (req, res) => {
   alexa.dispatch(req.body)
   .then(result => res.json(result))
@@ -119,6 +176,7 @@ app.post('/alexa/incoming', bodyParser.json(), (req, res) => {
 ```
 
 ### To-do
+
 - [ ] Add plugin support
 - [ ] Add more testing cases
 - [ ] Build plugins for Express, Hapi, Restify (...)
