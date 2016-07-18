@@ -1,4 +1,10 @@
 # alexa-router
+[![Build Status](https://circleci.com/gh/estate/alexa-router.svg?style=shield)](https://circleci.com/gh/estate/alexa-router)
+[![Code Climate](https://codeclimate.com/github/estate/alexa-router/badges/gpa.svg)](https://codeclimate.com/github/estate/alexa-router)
+[![Test Coverage](https://codeclimate.com/github/estate/alexa-router/badges/coverage.svg)](https://codeclimate.com/github/estate/alexa-router/coverage)
+[![Version](https://badge.fury.io/js/alexa-router.svg)](http://badge.fury.io/js/alexa-router)
+[![Downloads](http://img.shields.io/npm/dm/alexa-router.svg)](https://www.npmjs.com/package/alexa-router)
+
 
 The `alexa-router` project allows you to easily develop custom skills for
 Amazon's Alexa.
