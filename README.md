@@ -28,6 +28,61 @@ let alexa = new Alexa.Router()
 Once you intialize the router, you can either configure `actions` or `dispatch` a HTTP request to be
 routed to the actions you have configured.
 
+### `Router`
+
+#### API
+
+`new Alexa.Router(config)`
+
+#### config
+*Required* <br>
+Type: `object`
+
+
+`config.appId` <br>
+*Required*  <br>
+Type: `String[]`
+
+Your application ID or an array with many
+
+`config.routeIntentOnly` <br>
+*Optional*  <br>
+Type: `Boolean` <br>
+Default: `true`
+
+Try to route `IntentRequest` only
+
+`config.verifySignature` <br>
+*Optional*  <br>
+Type: `Boolean` <br>
+Default: `true`
+
+Verifies the incoming request against a valid Amazon's signature to prevent request forgery
+
+`config.verifyTimestamp` <br>
+*Optional*  <br>
+Type: `Boolean` <br>
+Default: `true`
+
+Verifies if the incoming request have a valid timestamp to prevent replay attacks
+
+`config.verifyAppId` <br>
+*Optional*  <br>
+Type: `Boolean` <br>
+Default: `true`
+
+Verifies if the incoming request have a valid application ID to prevent replay attacks
+from other applications
+
+#### Example
+
+```javascript
+let alexa = new Alexa.Router({
+  applicationId: 'my-id',
+  verifySignature: false
+})
+```
+
 ### `alexa.action`
 
 Routes are defined via the `action` method
@@ -138,13 +193,19 @@ The dispatch method takes a HTTP request and routes it to the appropriate action
 
 #### API
 
-`alexa.dispatch(requestBody)`
+`alexa.dispatch(requestBody, headers)`
 
 ##### requestBody
 *Required* <br>
 Type: 'object'
 
 The HTTP request body
+
+##### Headers
+*Required* <br>
+Type: 'object'
+
+The headers present in the original incoming request
 
 ### Understanding the routing mechanism
 
