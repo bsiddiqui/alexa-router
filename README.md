@@ -36,7 +36,7 @@ routed to the actions you have configured.
 
 #### config
 *Required* <br>
-Type: `object`
+Type: `Object`
 
 
 `config.appId` <br>
@@ -57,7 +57,8 @@ Try to route `IntentRequest` only
 Type: `Boolean` <br>
 Default: `true`
 
-Verifies the incoming request against a valid Amazon's signature to prevent request forgery
+Verifies the incoming request against a valid Amazon signature to prevent request forgery.
+Amazon [requires verification](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/developing-an-alexa-skill-as-a-web-service#Verifying) as part of the skill submission process
 
 `config.verifyTimestamp` <br>
 *Optional*  <br>
@@ -93,24 +94,24 @@ Routes are defined via the `action` method
 
 ##### name
 *Required* <br>
-Type: `string`
+Type: `String`
 
 The action name. You can reference this action by its name when defining complex action flows.
 
 ##### config
 *Required* <br>
-Type: `object`
+Type: `Object`
 
 `config.handler(request[, params])` <br>
 *Required* <br>
-Type: `function`
+Type: `Function`
 
 The handler receives the HTTP request and optionally receives params if they were configured to
 be passed by a previous action.
 
 `config.global` <br>
 *Optional* <br>
-Type: `object`
+Type: `Object`
 
 Actions with the global key are accessible at any point in the routing flow. These actions can be
 used to kick-off a new flow, interrupt an existing flow, etc. An action to help the user know what
@@ -118,13 +119,13 @@ commands are available or cancel the request are two examples for where you migh
 
 `config.global.type` <br>
 *Required* <br>
-Type: `string`
+Type: `String`
 
 One of 'intent', 'launch', 'sessionEnded', or 'unexpected'
 
 `config.global.intent` <br>
 *Required if type === 'intent'* <br>
-Type: `string`
+Type: `String`
 
 The custom or [built-in](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/implementing-the-built-in-intents)
 intent that this action should be associated with. e.g. 'AMAZON.YesIntent'
@@ -197,13 +198,13 @@ The dispatch method takes a HTTP request and routes it to the appropriate action
 
 ##### requestBody
 *Required* <br>
-Type: 'object'
+Type: 'Object'
 
 The HTTP request body
 
 ##### Headers
 *Required* <br>
-Type: 'object'
+Type: 'Object'
 
 The headers present in the original incoming request
 

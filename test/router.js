@@ -197,7 +197,7 @@ lab.describe('router', () => {
     .then(() => expect(error).to.be.instanceof(Alexa.errors.RoutingFailed))
   })
 
-  lab.test('should throw trying to retrieve a certificate from an malicious source', co.wrap(function * () {
+  lab.test('should throw trying to retrieve a certificate from a malicious source', co.wrap(function * () {
     let alexa = fixtures.simpleRouting()
     let errors = yield {
       one: alexa._retrieveCertificate('http://malicious.com').catch(err => err),
