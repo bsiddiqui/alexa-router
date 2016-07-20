@@ -22,10 +22,12 @@ $ npm install -S alexa-router
 
 ```javascript
 let Alexa = require('alexa-router')
-let alexa = new Alexa.Router()
+let alexa = new Alexa.Router({
+  appId: 'my-app-id'
+})
 ```
 
-Once you intialize the router, you can either configure `actions` or `dispatch` a HTTP request to be
+Once you initialize the router, you can either configure `actions` or `dispatch` a HTTP request to be
 routed to the actions you have configured.
 
 ### `Router`
@@ -79,7 +81,7 @@ from other applications
 
 ```javascript
 let alexa = new Alexa.Router({
-  applicationId: 'my-id',
+  appId: 'my-id',
   verifySignature: false
 })
 ```
@@ -133,6 +135,7 @@ intent that this action should be associated with. e.g. 'AMAZON.YesIntent'
 #### Examples
 
 A simple action that can be activated by an incoming intent
+
 ```javascript
 alexa.action('global-hello', {
   handler: request => {...},
@@ -228,14 +231,16 @@ let bodyParser = require('body-parser')
 let Alexa = require('alexa-router')
 
 let app = express()
-let alexa = new Alexa.Router()
+let alexa = new Alexa.Router({
+  appId: 'my-app-id'
+})
 
 // Do all your routing configs
 alexa.action('my-action', ...)
 
 // Configure a route for passing JSON to alexa-router
 app.post('/alexa/incoming', bodyParser.json(), (req, res) => {
-  alexa.dispatch(req.body)
+  alexa.dispatch(req.body, req.headers)
   .then(result => res.json(result))
   .catch(err => {
     res.send('Somthing bad happened...').status(500)
