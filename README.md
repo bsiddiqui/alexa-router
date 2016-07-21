@@ -17,7 +17,7 @@ $ npm install -S alexa-router
 
 ## Usage
 
-`alexa-router` is available via an in instance of the `Router`. Make sure you begin by initializing the
+`alexa-router` is available via an instance of the `Router`. Make sure you begin by initializing the
 `Router`.
 
 ```javascript
@@ -30,13 +30,13 @@ let alexa = new Alexa.Router({
 Once you initialize the router, you can either configure `actions` or `dispatch` a HTTP request to be
 routed to the actions you have configured.
 
-### `Router`
+## `Router`
 
-#### API
+### API
 
 `new Alexa.Router(config)`
 
-#### config
+### config
 *Required* <br>
 Type: `Object`
 
@@ -77,7 +77,7 @@ Default: `true`
 Verifies if the incoming request have a valid application ID to prevent replay attacks
 from other applications
 
-#### Example
+### Examples
 
 ```javascript
 let alexa = new Alexa.Router({
@@ -86,36 +86,114 @@ let alexa = new Alexa.Router({
 })
 ```
 
-### `alexa.action`
+## `alexa.action`
 
 Routes are defined via the `action` method
 
-#### API
+### API
 
 `alexa.action(name, config)`
 
-##### name
+#### name
 *Required* <br>
 Type: `String`
 
 The action name. You can reference this action by its name when defining complex action flows.
 
-##### config
+#### config
 *Required* <br>
 Type: `Object`
 
-`config.handler(request[, params])` <br>
+#### `config.handler(request[, params])` <br>
 *Required* <br>
 Type: `Function`
 
-The handler receives the HTTP request and optionally receives params if they were configured to
+The handler receives a decorated HTTP request and optionally receives params if they were configured to
 be passed by a previous action.
 
-`config.global` <br>
+##### request <br>
+Type: `Object`
+
+The decorated [Alexa Request Body](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference#Request Format) with additional methods.
+
+`request.next()` <br>
+Returns: `Array` <br>
+An array of Next Action Objects set by the previous response in the session
+
+`request.response()` <br>
+Returns: `Object` <br>
+A decorated [Alexa Response Object](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference#response-object)
+
+```javascript
+// Instantiate a new Response object
+let response = request.response()
+```
+
+`response.session(key, value)`<br>
+Param: key `String`<br>
+Param: value `String|Object`
+Sets, patches, or retrieves the session's attributes
+
+`response.speech(text)`<br>
+Param: text `String`<br>
+Convenience method to set speech with raw text or [SSML](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/speech-synthesis-markup-language-ssml-reference)
+
+`response.reprompt(text)`<br>
+Param: text `String`<br>
+Convenience method to set reprompt with raw text or [SSML](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/speech-synthesis-markup-language-ssml-reference)
+
+`response.card(card)` <br>
+Param: card `Object` a valid [Alexa Card Object](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference#Response Format) <br>
+Convenience method to set the response card
+
+`response.endSession(shouldEndSession)` <br>
+Param: shouldEndSession `Boolean` <br>
+A convenience to set the response `shouldEndSession` property
+
+`response.clearSession()` <br>
+Clears the current session
+
+`response.next(config)` <br>
+Param: config `Object|Array` <br>
+If you pass an object it will be merged with any previous Next Action Objects that were passed
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>The Next Action Object</b> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *Required* <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type: `String`<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; One of 'intent', 'launch', 'sessionEnded', or 'unexpected'
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; action <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *Required* <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type: `String` <br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The name of the action that should be called if this route is activated
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; intent <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *Required if type === 'intent'* <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type: `String`
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The custom or [built-in](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/implementing-the-built-in-intents)
+intent that this action should be associated with. e.g. 'AMAZON.YesIntent'
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; params <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *Optional* <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Type: `Any`
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Any data you'd like to pass to follow request if this route is activated
+
+##### params <br>
+Type: `Object`<br>
+
+Params set by a previous action
+
+
+#### `config.global` <br>
 *Optional* <br>
 Type: `Object`
 
-Actions with the global key are accessible at any point in the routing flow. These actions can be
+Actions with the global key are accessible at any point in the routing flow (like a catch-all). These actions can be
 used to kick-off a new flow, interrupt an existing flow, etc. An action to help the user know what
 commands are available or cancel the request are two examples for where you might use a global action.
 
@@ -132,7 +210,7 @@ Type: `String`
 The custom or [built-in](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/implementing-the-built-in-intents)
 intent that this action should be associated with. e.g. 'AMAZON.YesIntent'
 
-#### Examples
+### Examples
 
 A simple action that can be activated by an incoming intent
 
@@ -191,27 +269,27 @@ alexa.action('event-create-name', {
 })
 ```
 
-### `alexa.dispatch`
+## `alexa.dispatch`
 
 The dispatch method takes a HTTP request and routes it to the appropriate action
 
-#### API
+### API
 
 `alexa.dispatch(requestBody, headers)`
 
-##### requestBody
+#### requestBody
 *Required* <br>
 Type: 'Object'
 
 The HTTP request body
 
-##### Headers
+#### Headers
 *Required* <br>
 Type: 'Object'
 
 The headers present in the original incoming request
 
-### Understanding the routing mechanism
+## Understanding the routing mechanism
 
 1. Check if the incoming request was configured with `next` actions
   1. If `next` actions are present, try to resolve the next action
@@ -220,7 +298,7 @@ The headers present in the original incoming request
 3. If no global action was found try to find an `unexpected` global action
 4. If no `unexpected` global action then throw `RoutingFailed`
 
-### HTTP handling
+## HTTP handling
 
 `alexa-router` is HTTP server agnostic. This means that you can use it with
 any Node.js library that can parse and reply JSON. An example using Express:
@@ -248,13 +326,13 @@ app.post('/alexa/incoming', bodyParser.json(), (req, res) => {
 })
 ```
 
-### To-do
+## To-do
 
 - [ ] Add plugin support
 - [ ] Add more testing cases
 - [ ] Build plugins for Express, Hapi, Restify (...)
 
-### Testing
+## Testing
 
 ```bash
 git clone https://github.com/estate/alexa-router && cd alexa-router
