@@ -1,6 +1,6 @@
 {
   "name": "alexa-router",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Easily build custom skills for Alexa",
   "scripts": {
     "test": "standard && lab --verbose --colors --assert code",
