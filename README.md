@@ -326,11 +326,21 @@ app.post('/alexa/incoming', bodyParser.json(), (req, res) => {
 })
 ```
 
+### HTTP plugins
+
+* [hapi-alexa-router](https://github.com/estate/hapi-alexa-router)
+
+## Skills built with alexa-router
+
+* [alexa-pokedex](https://github.com/bsiddiqui/alexa-pokedex) - "Alexa, ask pokedex to identify pikachu!"
+
+If you build a skill with alexa-router, we'd love for you to make a PR with a link to your skill!
+
 ## To-do
 
 - [ ] Add plugin support
 - [ ] Add more testing cases
-- [ ] Build plugins for Express, Hapi, Restify (...)
+- [ ] Build plugins for Express, Restify (...)
 
 ## Testing
 
